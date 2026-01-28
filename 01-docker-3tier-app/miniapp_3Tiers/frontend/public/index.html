@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Tier App</title>
+    <style>
+        body {
+            background-color: powderblue;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 {
+            color: dimgray;
+        }
+        button {
+            color: green;
+            background-color: white;
+            border: 2px solid green;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: lightgreen;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            min-height: 50px;
+            white-space: pre-wrap;  /* Garde les retours à la ligne */
+            font-family: monospace;  /* Police pour JSON */
+        }
+    </style>
+</head>
+<body>
+    <h1>Check Tier3-App</h1>
+    
+    <button onclick="checkHealth()">Check Health</button>
+    <button onclick="addVisit()">Add Visit</button>
+    <button onclick="initDB()">Init DB</button>
+    
+    <div id="result">Click a button to interact with the API</div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
