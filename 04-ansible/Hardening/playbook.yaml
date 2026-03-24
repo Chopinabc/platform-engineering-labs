@@ -1,0 +1,6 @@
+- name: configuration of the hardening
+  hosts: all
+  become: true
+
+  roles:
+    - hardening

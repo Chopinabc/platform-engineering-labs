@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-netpol
+  labels:
+    app: backend
+    env: lab
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Egress
+    - Ingress
+  egress:
+    #Postgres rule
+    - to:
+      - podSelector:
+          matchLabels:
+            app: postgres
+      ports:
+      - protocol: TCP
+        port: 5432
+    #redis rule
+    - to:
+      - podSelector:
+          matchLabels:
+            app: redis
+      ports:
+      - protocol: TCP
+        port: 6379
+
+    #DNS rule
+    - ports: 
+      - protocol: TCP
+        port: 53
+      - protocol: UDP
+        port: 53
+  ingress:
+    #Frontend rule
+    - from:
+      - podSelector:
+          matchLabels:
+            app: frontend
+      ports:
+      - protocol: TCP
+        port: 3000

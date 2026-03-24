@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  postgres-headless
+  namespace: ecommerce
+  labels:
+    env: lab
+    app: postgres
+spec:
+  selector:
+    app: postgres
+  clusterIP: None
+  ports:
+  - name:  postgres-headless-ports
+    port:  5432
+    targetPort:  5432

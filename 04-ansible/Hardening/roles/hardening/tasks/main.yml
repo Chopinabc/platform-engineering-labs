@@ -1,0 +1,168 @@
+############################
+### Update && Upgrade
+############################ 
+
+- name: Include OS-specific tasks (update + install)
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
+
+
+############################
+### User + key 
+############################ 
+
+- name: Create service user
+  ansible.builtin.user:
+    name: "{{ sudo_user }}"
+    shell: /bin/bash
+    state: present
+
+- name: Set authorized key to service user
+  ansible.posix.authorized_key:
+    user: "{{ sudo_user }}"
+    state: present
+    key: "{{ ssh_public_key }}"
+
+
+############################
+### sudoers Config
+############################ 
+
+  #Add user
+- name: Creer et valider sudoers file before saving
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/{{ sudo_user }}
+    create: yes
+    state: present
+    regexp: "^{{ sudo_user }}\\s+ALL"
+    line: "{{ sudo_user }} ALL=(ALL:ALL) NOPASSWD:ALL" 
+    validate: /usr/sbin/visudo -cf %s
+
+  #Activate use_pty
+- name: Option use_pty pour assurer que les commandes root utilise un pty
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/use_pty
+    create: yes
+    state: present
+    regexp: "^#?Defaults\\s+!?use_pty"
+    line: "Defaults use_pty" 
+    validate: /usr/sbin/visudo -cf %s
+
+############################
+### SSH Config
+############################    
+
+- name : "config le PermitRootLogin: {{ permit_root_login }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin {{ permit_root_login }}"
+  notify: restart sshd 
+
+- name: "config le PasswordAuthentication: {{ password_authentication }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication {{ password_authentication }}"
+  notify: restart sshd 
+
+- name: "config le AllowUsers: {{ ssh_allowed_users | join(' ') }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?AllowUsers"
+    line: "AllowUsers {{ ssh_allowed_users | join(' ') }}"
+  notify: restart sshd 
+
+- name: "config le MaxAuthTries: {{ max_auth_tries }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?MaxAuthTries"
+    line: "MaxAuthTries {{ max_auth_tries }}"
+  notify: restart sshd 
+
+- name: "config le LoginGraceTime : {{ login_grace_time }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?LoginGraceTime"
+    line: "LoginGraceTime {{ login_grace_time }}"
+  notify: restart sshd
+
+- name: "config le ClientAliveInterval: {{ client_alive_interval }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?ClientAliveInterval"
+    line: "ClientAliveInterval {{ client_alive_interval }}"
+  notify: restart sshd 
+
+- name: "config le ClientAliveCountMax: {{ client_alive_count_max }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?ClientAliveCountMax"
+    line: "ClientAliveCountMax {{ client_alive_count_max }}"
+  notify: restart sshd 
+
+- name: "config le X11Forwarding: {{ x11_forwarding }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?X11Forwarding"
+    line: "X11Forwarding {{ x11_forwarding }}"
+  notify: restart sshd 
+
+- name: "config le AllowTcpForwarding: {{ allow_tcp_forwarding }}"
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?AllowTcpForwarding"
+    line: "AllowTcpForwarding {{ allow_tcp_forwarding }}"
+  notify: restart sshd
+
+
+############################
+### Systcl
+############################ 
+- name: Configuration Sysctl CIS Benchmark lvl 1
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_set: true
+  loop: "{{ sysctl_params | dict2items }}"
+
+
+############################
+### Fail2ban
+############################ 
+
+##Installation faite par le ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml" au debut
+
+- name: Enable and start fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: yes
+
+- name: Configuration fail2ban
+  ansible.builtin.template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    mode: "0644"
+  notify: restart fail2ban
+
+############################
+### Auditd
+############################ 
+
+##Installation faite par le ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml" au debut
+
+- name: Enable and start auditd
+  ansible.builtin.service:
+    name: auditd
+    state: started
+    enabled: yes
+
+- name: Configuration auditd
+  ansible.builtin.template:
+    src: auditd.local.j2
+    dest: /etc/audit/rules.d/hardening.rules
+    owner: root
+    mode: "0644"
+  notify: reload auditd rules

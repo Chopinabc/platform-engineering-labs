@@ -1,0 +1,56 @@
+############################
+### Speciale t3.micro
+############################ 
+
+- name: Créer un fichier swap de 1GB
+  ansible.builtin.command: dd if=/dev/zero of=/swapfile bs=1M count=1024
+  args:
+    creates: /swapfile
+
+- name: Permissions swap
+  ansible.builtin.file:
+    path: /swapfile
+    mode: '0600'
+
+- name: Formater le swap
+  ansible.builtin.command: mkswap /swapfile
+
+- name: Activer le swap
+  ansible.builtin.command: swapon /swapfile
+  ignore_errors: true
+  
+############################
+### Update && Upgrade
+############################ 
+
+- name: Update packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+############################
+### Fail2ban
+############################ 
+
+- name: Install EPEL repository
+  ansible.builtin.dnf:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
+    state: present
+    disable_gpg_check: true
+
+- name: Install fail2ban
+  ansible.builtin.yum:
+    name: fail2ban
+    state: present
+
+
+############################
+### Auditd
+############################ 
+
+- name: Install auditd 
+  ansible.builtin.yum:
+    name:
+      - audit
+      - audit-libs
+    state: present

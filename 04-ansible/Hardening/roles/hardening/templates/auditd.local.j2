@@ -1,0 +1,71 @@
+# ============================================================
+# Auditd Rules - CIS Benchmark Level 1
+# ============================================================
+
+# Supprimer toutes les règles existantes au chargement
+-D
+
+# Taille du buffer kernel pour les événements audit
+# Augmenter si perte d'événements sous forte charge
+-b 8192
+
+# ============================================================
+# Connexions et sessions
+# ============================================================
+
+# Logins / logouts / changements de session
+-w /var/log/lastlog -p wa -k logins
+-w /var/run/faillock -p wa -k logins
+
+# ============================================================
+# Élévation de privilèges
+# ============================================================
+
+# Toutes les commandes exécutées via sudo
+-w /var/log/sudo.log -p wa -k sudo_actions
+-w /etc/sudoers -p wa -k sudoers_changes
+-w /etc/sudoers.d/ -p rwa -k sudoers_changes
+
+# ============================================================
+# Modification des comptes et accès
+# ============================================================
+
+# Modifications des utilisateurs, groupes et mots de passe
+-w /etc/passwd -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/group -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-w /etc/security/opasswd -p wa -k identity
+
+# ============================================================
+# Appels système sensibles
+# ============================================================
+
+# Modifications de permissions et propriétaires
+-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -k perm_mod
+-a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -k perm_mod
+
+# Accès non autorisés (tentatives refusées)
+-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EACCES -k access
+-a always,exit -F arch=b64 -S creat,open,openat,truncate,ftruncate -F exit=-EPERM -k access
+
+# Montages et démontages
+-a always,exit -F arch=b64 -S mount -k mounts
+
+# ============================================================
+# Configuration réseau et système
+# ============================================================
+
+# Modifications de la configuration réseau
+-w /etc/hosts -p wa -k network_config
+-w /etc/sysctl.conf -p wa -k sysctl_changes
+-w /etc/sysctl.d/ -p wa -k sysctl_changes
+
+# Modifications SSH
+-w /etc/ssh/sshd_config -p wa -k sshd_config
+
+# ============================================================
+# Rendre les règles immuables (CIS - dernière ligne obligatoire)
+# Nécessite un reboot pour modifier les règles après ça
+# ============================================================
+-e 2

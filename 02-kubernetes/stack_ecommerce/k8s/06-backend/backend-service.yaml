@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  backend-service
+  namespace: ecommerce
+  labels:
+    app: backend
+    env: lab
+spec:
+  selector:
+    app:  backend
+  type:  ClusterIP
+  ports:
+  - name:  backend-http
+    port:  3000
+    targetPort:  3000
