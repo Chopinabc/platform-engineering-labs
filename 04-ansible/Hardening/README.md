@@ -11,7 +11,7 @@ inventaire dynamique.
 ```
 Ansible Controller
     └── Inventaire dynamique AWS EC2 (aws_ec2.yml)
-        └── Role hardening → 4 instances RHEL (t3.micro)
+        └── Role hardening → 4 instances RHEL
             ├── SSH hardening
             ├── Sysctl (kernel security)
             ├── Fail2ban (brute force protection)
@@ -159,7 +159,7 @@ python3 -c "import boto3; print('OK')"
 **Permission denied (publickey)**
 ```bash
 # Vérifier le user et la clé privée
-ansible ... --user ec2-user --private-key ~/.ssh/your-key
+ssh -i ~/.ssh/your-key user@ip
 ```
 
 ---
