@@ -17,8 +17,8 @@ private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
 ###############
 
 db_name = "ecommercedb"
-db_password = "exemple123!"
-db_username = "Admin123"
+db_password = "CHANGEME"
+db_username = "CHANGEME"
 engine_db = "postgres"
 engineversion_db = "17.6"
 instanceclass_db = "db.t3.micro"

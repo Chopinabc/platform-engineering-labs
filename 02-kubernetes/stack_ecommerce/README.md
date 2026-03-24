@@ -95,7 +95,9 @@ kubectl get nodes
 
 ---
 
-### 2. Configurer les secrets
+### 2. Configurer les secrets & changemenet de MDP
+
+Éditer `app/backend/server.js` et changer `database: process.env.POSTGRES_DB || 'CHANGEME`
 
 Éditer `k8s/02-secrets/secret.yaml` et remplacer les valeurs avant tout déploiement :
 
@@ -107,7 +109,7 @@ stringData:
 ```
 
 ```bash
-nano k8s/02-secrets/secret.yaml
+vim k8s/02-secrets/secret.yaml
 ```
 
 > ⚠️ `secret.yaml` est dans `.gitignore` — ne jamais committer ce fichier avec un vrai mot de passe.

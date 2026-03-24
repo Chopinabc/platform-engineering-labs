@@ -14,7 +14,7 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT || '5432'),
   user: process.env.POSTGRES_USER || 'appuser',
   password: process.env.POSTGRES_PASSWORD || 'securepass',
-  database: process.env.POSTGRES_DB || 'ecommercedb',
+  database: process.env.POSTGRES_DB || 'CHANGEME',
 });
 
 // Redis client

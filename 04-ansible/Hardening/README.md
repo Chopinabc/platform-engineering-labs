@@ -78,6 +78,15 @@ export AWS_SECRET_ACCESS_KEY="your_secret"
 export AWS_DEFAULT_REGION="us-east-1"
 ```
 
+
+### Configurer les variables
+
+Rajouter la publique key du service account dans `Hardening/group_vars/all/vars.yml`
+Remplir la configuration dans `Hardening/roles/hardening/defaults/main.yml`
+
+avant tout déploiement
+
+---
 ### Lancer le playbook
 
 ```bash
@@ -132,8 +141,7 @@ Hardening/
 
 | Règle | Statut | Justification |
 |-------|--------|---------------|
-| Sudo sans password (NOPASSWD) | Écart assumé | Compte de service Ansible - automatisation requiert sudo non interactif. Compensé par authentification par clé SSH uniquement et audit auditd. |
-| Swap activé sur t3.micro | Spécifique lab | t3.micro (1GB RAM) - swap nécessaire pour l'installation des packages. Non applicable en production (instance correctement dimensionnée). |
+| Sudo sans password (NOPASSWD) | Écart assumé | Compte de service Ansible - automatisation requiert sudo non interactif. Compensé par authentification par clé SSH uniquement et audit auditd.
 
 ---
 
@@ -146,12 +154,6 @@ aws sts get-caller-identity
 
 # Vérifier boto3
 python3 -c "import boto3; print('OK')"
-```
-
-**OOM lors de l'installation (t3.micro)**
-```bash
-# Le playbook active automatiquement 1GB de swap avant l'installation
-# Voir tasks/RedHat.yml - section "Spéciale t3.micro"
 ```
 
 **Permission denied (publickey)**

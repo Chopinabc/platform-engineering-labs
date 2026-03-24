@@ -1,0 +1,45 @@
+
+sudo_user: "deployment"
+
+#SSH Config
+ssh_allowed_users: ["deployment"]
+permit_root_login: "no"
+password_authentication: "no"
+max_auth_tries: 4
+login_grace_time: 60
+client_alive_interval: 300
+client_alive_count_max: 0
+x11_forwarding: "no"                  # Désactive le forwarding d'affichage graphique via SSH
+allow_tcp_forwarding: "no"            # Désactive le forwarding de ports TCP via SSH
+
+#Sysctl
+sysctl_params:
+
+  # Active le filtre de chemin inverse sur toutes les interfaces
+  # Bloque les paquets dont l'IP source ne correspond pas à la route de retour
+  # Protection contre le spoofing IP
+  "net.ipv4.conf.all.rp_filter": 1
+  "net.ipv4.conf.default.rp_filter": 1
+  # Protection contre les attaques SYN flood 
+  "net.ipv4.tcp_syncookies": 1
+  # Désactive le routage IP entre les interfaces
+  "net.ipv4.ip_forward": 0
+   # Refuse les paquets ICMP redirect entrants
+  # Un attaquant pourrait modifier la table de routage via des redirects
+  "net.ipv4.conf.all.accept_redirects": 0
+  "net.ipv4.conf.default.accept_redirects": 0
+  # Désactive l'envoi de paquets ICMP redirect
+  # Le serveur ne doit pas rediriger le trafic des autres hôtes
+  "net.ipv4.conf.all.send_redirects": 0
+  "net.ipv4.conf.default.send_redirects": 0
+  # Refuse les paquets avec option Source Route
+  # Empêche un attaquant d'imposer le chemin réseau d'un paquet
+  "net.ipv4.conf.all.accept_source_route": 0
+  "net.ipv4.conf.default.accept_source_route": 0
+  # Rend l'exploitation des vulnérabilités mémoire beaucoup plus difficile
+  "kernel.randomize_va_space": 2
+
+#Fail2ban Config
+fail2ban_maxretry: 5
+fail2ban_findtime: 60
+fail2ban_bantime: 3600
