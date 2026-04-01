@@ -27,6 +27,7 @@ resource "aws_security_group" "vpc_endpoint" {
   
 }
 
+# communication principale avec l'API SSM (récupérer les paramètres, démarrer les sessions)
 resource "aws_vpc_endpoint" "ssm" {
   vpc_id              = var.vpc_id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ssm"
@@ -36,6 +37,7 @@ resource "aws_vpc_endpoint" "ssm" {
   private_dns_enabled = true
 }
 
+#canal de communication pour Session Manager (c'est LUI qui gère la session interactive dans ton terminal)
 resource "aws_vpc_endpoint" "ssmmessages" {
   vpc_id              = var.vpc_id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ssmmessages"
@@ -45,6 +47,7 @@ resource "aws_vpc_endpoint" "ssmmessages" {
   private_dns_enabled = true
 }
 
+# communication entre SSM Agent sur l'EC2 et AWS (heartbeat, commandes Run Command)
 resource "aws_vpc_endpoint" "ec2messages" {
   vpc_id              = var.vpc_id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.ec2messages"
